@@ -68,7 +68,7 @@ namespace AppMigration
 
         public static bool EnsureWingetInstalled()
         {
-            string version = "v1.1.12653";
+            string version = "v1.2.10271";
             if (!ExistsOnPath("winget.exe"))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -99,10 +99,11 @@ namespace AppMigration
             string filename = "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle";
             string remoteUri = "https://github.com/microsoft/winget-cli/releases/download/" + version + "/" + filename;
             webClient.DownloadFile(remoteUri,filename);
-            PowerShell ps = PowerShell.Create();
-            ps.AddCommand("Add-AppPackage");
-            ps.AddParameter("Path", filename);
-            ps.Invoke();
+            Process p = new Process();
+            p.StartInfo.FileName = "powershell.exe";
+            p.StartInfo.Arguments = $@"Add-AppPackage -Path {filename} -InstallAllResources";
+            p.Start();
+            p.WaitForExit(120000);
             if (ExistsOnPath("winget.exe"))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
